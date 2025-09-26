@@ -223,8 +223,8 @@ def search_view(request):
     word="Searched Result :"
 
     if request.user.is_authenticated:
-        return render(request,'ecom/customer_home.html',{'products':products,'word':word,'product_count_in_cart':product_count_in_cart})
-    return render(request,'ecom/index.html',{'products':products,'word':word,'product_count_in_cart':product_count_in_cart})
+        return render(request,'ss/customer_home.html',{'products':products,'word':word,'product_count_in_cart':product_count_in_cart})
+    return render(request,'ss/index.html',{'products':products,'word':word,'product_count_in_cart':product_count_in_cart})
 
 
 # any one can add product to cart, no need of signin
