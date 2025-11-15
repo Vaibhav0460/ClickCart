@@ -1,6 +1,6 @@
 from django.shortcuts import render,redirect,reverse
 from . import forms,models
-from django.http import HttpResponseRedirect,HttpResponse
+from django.http import HttpResponseRedirect,HttpResponse,JsonResponse
 from django.core.mail import send_mail
 from django.contrib.auth.models import Group
 from django.contrib.auth.decorators import login_required,user_passes_test
@@ -229,35 +229,57 @@ def search_view(request):
 
 # any one can add product to cart, no need of signin
 def add_to_cart_view(request,pk):
-    products=models.Product.objects.all()
-
-    #for cart counter, fetching products ids added by customer from cookies
+    # Check if request is AJAX
+    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+    
+    # Get product
+    try:
+        product = models.Product.objects.get(id=pk)
+    except models.Product.DoesNotExist:
+        if is_ajax:
+            return JsonResponse({'success': False, 'message': 'Product not found'}, status=404)
+        messages.error(request, 'Product not found')
+        return redirect('/')
+    
+    # Adding product id to cookies
     if 'product_ids' in request.COOKIES:
         product_ids = request.COOKIES['product_ids']
-        counter=product_ids.split('|')
-        product_count_in_cart=len(counter)
-    else:
-        product_count_in_cart=0
-    product_count_in_cart += 1
-    if request.user.is_authenticated:
-        response = render(request, 'ss/customer_home.html',{'products':products,'product_count_in_cart':product_count_in_cart})
-    else:
-        response = render(request, 'ss/index.html',{'products':products,'product_count_in_cart':product_count_in_cart})
-
-    #adding product id to cookies
-    if 'product_ids' in request.COOKIES:
-        product_ids = request.COOKIES['product_ids']
-        if product_ids=="":
-            product_ids=str(pk)
+        if product_ids == "":
+            product_ids = str(pk)
         else:
-            product_ids=product_ids+"|"+str(pk)
-        response.set_cookie('product_ids', product_ids)
+            product_ids = product_ids + "|" + str(pk)
     else:
-        response.set_cookie('product_ids', pk)
-
-    product=models.Product.objects.get(id=pk)
+        product_ids = str(pk)
+    
+    # Calculate cart count
+    if product_ids:
+        counter = product_ids.split('|')
+        product_count_in_cart = len(counter)
+    else:
+        product_count_in_cart = 0
+    
+    # Handle AJAX request
+    if is_ajax:
+        response = JsonResponse({
+            'success': True,
+            'message': product.name + ' added to cart successfully!',
+            'cart_count': product_count_in_cart
+        })
+        response.set_cookie('product_ids', product_ids)
+        return response
+    
+    # Handle regular request (fallback for non-JS browsers)
+    products = models.Product.objects.all()
+    product_count_in_cart += 1  # Add 1 for the product we're adding
+    
+    if request.user.is_authenticated:
+        response = render(request, 'ss/customer_home.html', {'products': products, 'product_count_in_cart': product_count_in_cart})
+    else:
+        response = render(request, 'ss/index.html', {'products': products, 'product_count_in_cart': product_count_in_cart})
+    
+    response.set_cookie('product_ids', product_ids)
     messages.info(request, product.name + ' added to cart successfully!')
-
+    
     return response
 
 
@@ -281,11 +303,15 @@ def cart_view(request):
             product_id_in_cart=product_ids.split('|')
             
             for p in product_id_in_cart:
-                product = models.Product.objects.get(id__in = p)
-                if productList.get(product) != None:
-                    productList[product] += 1
-                else:
-                    productList[product] = 1
+                try:
+                    product = models.Product.objects.get(id=int(p))
+                    if productList.get(product) != None:
+                        productList[product] += 1
+                    else:
+                        productList[product] = 1
+                except (models.Product.DoesNotExist, ValueError):
+                    # Skip invalid product IDs
+                    continue
             # products=models.Product.objects.all().filter(id__in = product_id_in_cart)
                 
             #for total price shown in cart
@@ -295,41 +321,16 @@ def cart_view(request):
 
 
 def cart_remove_view(request,pk):
-    #for counter in cart
-    if 'product_ids' in request.COOKIES:
-        product_ids = request.COOKIES['product_ids']
-        counter=product_ids.split('|')
-        product_count_in_cart=len(counter)
-    else:
-        product_count_in_cart=0
-    product_count_in_cart -= 1
-    total=0
-    productList = {}
-    if 'product_ids' in request.COOKIES:
-        product_ids = request.COOKIES['product_ids']
-        if product_ids != "":
-            product_id_in_cart=product_ids.split('|')
-            product_id_in_cart=list(product_id_in_cart)
-            product_id_in_cart.remove(str(pk))
-            for p in product_id_in_cart:
-                product = models.Product.objects.get(id__in = p)
-                if productList.get(product) != None:
-                    productList[product] += 1
-                else:
-                    productList[product] = 1
-            # products=models.Product.objects.all().filter(id__in = product_id_in_cart)
-                
-            #for total price shown in cart
-            for p, q in productList.items():
-                total=total+p.price*q
-    response = render(request,'ss/cart.html',{'products':productList,'total':total,'product_count_in_cart':product_count_in_cart})
+    # Check if request is AJAX
+    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
     
-    # removing product id from cookie
+    # Removing product id from cookie
     if 'product_ids' in request.COOKIES:
         product_ids = request.COOKIES['product_ids']
         product_id_in_cart=product_ids.split('|')
         product_id_in_cart=list(product_id_in_cart)
-        product_id_in_cart.remove(str(pk))
+        if str(pk) in product_id_in_cart:
+            product_id_in_cart.remove(str(pk))
         #  for update coookie value after removing product id in cart
         value=""
         for i in range(len(product_id_in_cart)):
@@ -337,110 +338,211 @@ def cart_remove_view(request,pk):
                 value=value+product_id_in_cart[0]
             else:
                 value=value+"|"+product_id_in_cart[i]
-        if value=="":
-            response.delete_cookie('product_ids')
-        response.set_cookie('product_ids',value)
-        
-    return response
-    
-def cart_add_view(request, pk):
-    products=models.Product.objects.all()
-
-    #for cart counter, fetching products ids added by customer from cookies
-    if 'product_ids' in request.COOKIES:
-        product_ids = request.COOKIES['product_ids']
-        counter=product_ids.split('|')
-        product_count_in_cart=len(counter)
     else:
-        product_count_in_cart=0
-    product_count_in_cart += 1
+        value = ""
+    
+    # Calculate cart data
     total=0
     productList = {}
-    if 'product_ids' in request.COOKIES:
-        product_ids = request.COOKIES['product_ids']
-        if product_ids != "":
-            product_id_in_cart=product_ids.split('|')
-            product_id_in_cart=list(product_id_in_cart)
-            product_id_in_cart.append(str(pk))
-            for p in product_id_in_cart:
-                product = models.Product.objects.get(id__in = p)
+    product_count_in_cart = 0
+    
+    if value != "":
+        for p in product_id_in_cart:
+            try:
+                product = models.Product.objects.get(id=int(p))
                 if productList.get(product) != None:
                     productList[product] += 1
                 else:
                     productList[product] = 1
-            # products=models.Product.objects.all().filter(id__in = product_id_in_cart)
+            except (models.Product.DoesNotExist, ValueError):
+                continue
                 
-            #for total price shown in cart
-            for p, q in productList.items():
-                total += p.price*q
+        #for total price shown in cart
+        for p, q in productList.items():
+            total=total+p.price*q
+        
+        product_count_in_cart = len(product_id_in_cart)
+    
+    # Handle AJAX request
+    if is_ajax:
+        # Build product list for JSON response
+        products_data = []
+        for product, quantity in productList.items():
+            products_data.append({
+                'id': product.id,
+                'name': product.name,
+                'price': product.price,
+                'quantity': quantity,
+                'image_url': product.product_image.url if product.product_image else '',
+                'total': product.price * quantity
+            })
+        
+        response = JsonResponse({
+            'success': True,
+            'products': products_data,
+            'total': total,
+            'cart_count': product_count_in_cart,
+            'grand_total': total + 100
+        })
+        if value=="":
+            response.delete_cookie('product_ids')
+        else:
+            response.set_cookie('product_ids', value)
+        return response
+    
+    # Handle regular request (fallback)
     response = render(request,'ss/cart.html',{'products':productList,'total':total,'product_count_in_cart':product_count_in_cart})
-
-    #adding product id to cookies
+    if value=="":
+        response.delete_cookie('product_ids')
+    else:
+        response.set_cookie('product_ids',value)
+    return response
+    
+def cart_add_view(request, pk):
+    # Check if request is AJAX
+    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+    
+    # Adding product id to cookies
     if 'product_ids' in request.COOKIES:
         product_ids = request.COOKIES['product_ids']
         if product_ids=="":
             product_ids=str(pk)
         else:
             product_ids=product_ids+"|"+str(pk)
-        response.set_cookie('product_ids', product_ids)
     else:
-        response.set_cookie('product_ids', pk)
-
-
+        product_ids = str(pk)
+    
+    # Calculate cart data
+    total=0
+    productList = {}
+    product_count_in_cart = 0
+    
+    if product_ids:
+        product_id_in_cart=product_ids.split('|')
+        for p in product_id_in_cart:
+            try:
+                product = models.Product.objects.get(id=int(p))
+                if productList.get(product) != None:
+                    productList[product] += 1
+                else:
+                    productList[product] = 1
+            except (models.Product.DoesNotExist, ValueError):
+                continue
+                
+        #for total price shown in cart
+        for p, q in productList.items():
+            total += p.price*q
+        
+        product_count_in_cart = len(product_id_in_cart)
+    
+    # Handle AJAX request
+    if is_ajax:
+        # Build product list for JSON response
+        products_data = []
+        for product, quantity in productList.items():
+            products_data.append({
+                'id': product.id,
+                'name': product.name,
+                'price': product.price,
+                'quantity': quantity,
+                'image_url': product.product_image.url if product.product_image else '',
+                'total': product.price * quantity
+            })
+        
+        response = JsonResponse({
+            'success': True,
+            'products': products_data,
+            'total': total,
+            'cart_count': product_count_in_cart,
+            'grand_total': total + 100
+        })
+        response.set_cookie('product_ids', product_ids)
+        return response
+    
+    # Handle regular request (fallback)
+    response = render(request,'ss/cart.html',{'products':productList,'total':total,'product_count_in_cart':product_count_in_cart})
+    response.set_cookie('product_ids', product_ids)
     return response
 
 def cart_delete_view(request,pk):
-    #for counter in cart
-    x=0
-    if 'product_ids' in request.COOKIES:
-        product_ids = request.COOKIES['product_ids']
-        counter=product_ids.split('|')
-        counter = list(counter)
-        x = counter.count(str(pk))
-        product_count_in_cart=len(counter)
-    else:
-        product_count_in_cart=0
+    # Check if request is AJAX
+    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
     
-    product_count_in_cart -= x
-    total=0
-    productList = {}
+    # Removing all occurrences of product id from cookie
     if 'product_ids' in request.COOKIES:
         product_ids = request.COOKIES['product_ids']
         if product_ids != "":
             product_id_in_cart=product_ids.split('|')
             product_id_in_cart=list(product_id_in_cart)
-            # product_id_in_cart.remove(str(pk))
-            product_id_in_cart = [j for i,j in enumerate(product_id_in_cart) if j!=str(pk)]
-            for p in product_id_in_cart:
-                product = models.Product.objects.get(id__in = p)
+            # Remove all occurrences of this product ID
+            product_id_in_cart = [j for j in product_id_in_cart if j != str(pk)]
+            # Build cookie value
+            value=""
+            for i in range(len(product_id_in_cart)):
+                if i==0:
+                    value=value+product_id_in_cart[0]
+                else:
+                    value=value+"|"+product_id_in_cart[i]
+        else:
+            value = ""
+    else:
+        value = ""
+    
+    # Calculate cart data
+    total=0
+    productList = {}
+    product_count_in_cart = 0
+    
+    if value != "":
+        for p in product_id_in_cart:
+            try:
+                product = models.Product.objects.get(id=int(p))
                 if productList.get(product) != None:
                     productList[product] += 1
                 else:
                     productList[product] = 1
-            # products=models.Product.objects.all().filter(id__in = product_id_in_cart)
+            except (models.Product.DoesNotExist, ValueError):
+                continue
                 
-            #for total price shown in cart
-            for p, q in productList.items():
-                total += p.price*q
-    response = render(request,'ss/cart.html',{'products':productList,'total':total,'product_count_in_cart':product_count_in_cart})
+        #for total price shown in cart
+        for p, q in productList.items():
+            total += p.price*q
+        
+        product_count_in_cart = len(product_id_in_cart)
     
-    # removing product id from cookie
-    if 'product_ids' in request.COOKIES:
-        product_ids = request.COOKIES['product_ids']
-        product_id_in_cart=product_ids.split('|')
-        product_id_in_cart=list(product_id_in_cart)
-        product_id_in_cart = [j for i,j in enumerate(product_id_in_cart) if j!=str(pk)]
-        #  for update coookie value after removing product id in cart
-        value=""
-        for i in range(len(product_id_in_cart)):
-            if i==0:
-                value=value+product_id_in_cart[0]
-            else:
-                value=value+"|"+product_id_in_cart[i]
+    # Handle AJAX request
+    if is_ajax:
+        # Build product list for JSON response
+        products_data = []
+        for product, quantity in productList.items():
+            products_data.append({
+                'id': product.id,
+                'name': product.name,
+                'price': product.price,
+                'quantity': quantity,
+                'image_url': product.product_image.url if product.product_image else '',
+                'total': product.price * quantity
+            })
+        
+        response = JsonResponse({
+            'success': True,
+            'products': products_data,
+            'total': total,
+            'cart_count': product_count_in_cart,
+            'grand_total': total + 100
+        })
         if value=="":
             response.delete_cookie('product_ids')
+        else:
+            response.set_cookie('product_ids', value)
+        return response
+    
+    # Handle regular request (fallback)
+    response = render(request,'ss/cart.html',{'products':productList,'total':total,'product_count_in_cart':product_count_in_cart})
+    if value=="":
+        response.delete_cookie('product_ids')
+    else:
         response.set_cookie('product_ids',value)
-        
     return response
 
 
@@ -495,11 +597,14 @@ def checkout_view(request):
             product_id_in_cart=product_ids.split('|')
             
             for p in product_id_in_cart:
-                product = models.Product.objects.get(id__in = p)
-                if productList.get(product) != None:
-                    productList[product] += 1
-                else:
-                    productList[product] = 1
+                try:
+                    product = models.Product.objects.get(id=int(p))
+                    if productList.get(product) != None:
+                        productList[product] += 1
+                    else:
+                        productList[product] = 1
+                except (models.Product.DoesNotExist, ValueError):
+                    continue
             # products=models.Product.objects.all().filter(id__in = product_id_in_cart)
                 
             #for total price shown in cart
@@ -556,11 +661,14 @@ def payment_success_view(request):
             product_id_in_cart=product_ids.split('|')
             product_id_in_cart = list(product_id_in_cart)
             for p in product_id_in_cart:
-                product = models.Product.objects.get(id__in = p)
-                if products.get(product) != None:
-                    products[product] += 1
-                else:
-                    products[product] = 1
+                try:
+                    product = models.Product.objects.get(id=int(p))
+                    if products.get(product) != None:
+                        products[product] += 1
+                    else:
+                        products[product] = 1
+                except (models.Product.DoesNotExist, ValueError):
+                    continue
     if 'email' in request.COOKIES:
         email=request.COOKIES['email']
     if 'mobile' in request.COOKIES:
