@@ -90,14 +90,14 @@ def admin_dashboard_view(request):
     'ordercount':ordercount,
     'data':zip(ordered_products,ordered_bys,orders),
     }
-    return render(request,'ecom/admin_dashboard.html',context=mydict)
+    return render(request,'ss/admin_dashboard.html',context=mydict)
 
 
 # admin view customer table
 @login_required(login_url='adminlogin')
 def view_customer_view(request):
     customers=models.Customer.objects.all()
-    return render(request,'ecom/view_customer.html',{'customers':customers})
+    return render(request,'ss/view_customer.html',{'customers':customers})
 
 # admin delete customer
 @login_required(login_url='adminlogin')
@@ -125,13 +125,13 @@ def update_customer_view(request,pk):
             user.save()
             customerForm.save()
             return redirect('view-customer')
-    return render(request,'ecom/admin_update_customer.html',context=mydict)
+    return render(request,'ss/admin_update_customer.html',context=mydict)
 
 # admin view the product
 @login_required(login_url='adminlogin')
 def admin_products_view(request):
     products=models.Product.objects.all()
-    return render(request,'ecom/admin_products.html',{'products':products})
+    return render(request,'ss/admin_products.html',{'products':products})
 
 
 # admin add product by clicking on floating button
@@ -143,7 +143,7 @@ def admin_add_product_view(request):
         if productForm.is_valid():
             productForm.save()
         return HttpResponseRedirect('admin-products')
-    return render(request,'ecom/admin_add_products.html',{'productForm':productForm})
+    return render(request,'ss/admin_add_products.html',{'productForm':productForm})
 
 
 @login_required(login_url='adminlogin')
@@ -162,7 +162,7 @@ def update_product_view(request,pk):
         if productForm.is_valid():
             productForm.save()
             return redirect('admin-products')
-    return render(request,'ecom/admin_update_product.html',{'productForm':productForm})
+    return render(request,'ss/admin_update_product.html',{'productForm':productForm})
 
 
 @login_required(login_url='adminlogin')
@@ -175,7 +175,7 @@ def admin_view_booking_view(request):
         ordered_by=models.Customer.objects.all().filter(id = order.customer.id)
         ordered_products.append(ordered_product)
         ordered_bys.append(ordered_by)
-    return render(request,'ecom/admin_view_booking.html',{'data':zip(ordered_products,ordered_bys,orders)})
+    return render(request,'ss/admin_view_booking.html',{'data':zip(ordered_products,ordered_bys,orders)})
 
 
 @login_required(login_url='adminlogin')
@@ -194,14 +194,14 @@ def update_order_view(request,pk):
         if orderForm.is_valid():
             orderForm.save()
             return redirect('admin-view-booking')
-    return render(request,'ecom/update_order.html',{'orderForm':orderForm})
+    return render(request,'ss/update_order.html',{'orderForm':orderForm})
 
 
 # admin view the feedback
 @login_required(login_url='adminlogin')
 def view_feedback_view(request):
     feedbacks=models.Feedback.objects.all().order_by('-id')
-    return render(request,'ecom/view_feedback.html',{'feedbacks':feedbacks})
+    return render(request,'ss/view_feedback.html',{'feedbacks':feedbacks})
 
 
 
@@ -826,7 +826,7 @@ def contactus_view(request):
             name=sub.cleaned_data['Name']
             message = sub.cleaned_data['Message']
             send_mail(str(name)+' || '+str(email),message, settings.EMAIL_HOST_USER, settings.EMAIL_RECEIVING_USER, fail_silently = False)
-            return render(request, 'ecom/contactussuccess.html')
+            return render(request, 'ss/contactussuccess.html')
     return render(request, 'ss/contactus.html', {'form':sub, 'product_count_in_cart':product_count_in_cart})
 
 

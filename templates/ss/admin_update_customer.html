@@ -1,0 +1,68 @@
+{% extends 'ss/admin_base.html' %}
+{% load widget_tweaks %}
+{% block content %}
+
+<div class="row justify-content-center">
+    <div class="col-lg-10 col-xl-8">
+        <div class="card border-0 shadow-sm rounded">
+            <div class="card-header bg-primary text-white py-3">
+                <h4 class="card-title mb-0 text-center fw-bold text-white">Update Customer Details</h4>
+            </div>
+            <div class="card-body p-4 p-md-5">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label class="form-label fw-bold text-secondary">First Name</label>
+                                {% render_field userForm.first_name class="form-control py-2 rounded-pill border-secondary" placeholder="First Name" %}
+                            </div>
+                            
+                            <div class="form-group mb-3">
+                                <label class="form-label fw-bold text-secondary">Username</label>
+                                {% render_field userForm.username class="form-control py-2 rounded-pill border-secondary" placeholder="Username" %}
+                            </div>
+                            
+                            <div class="form-group mb-3">
+                                <label class="form-label fw-bold text-secondary">Mobile Number</label>
+                                {% render_field customerForm.mobile class="form-control py-2 rounded-pill border-secondary" placeholder="Mobile" %}
+                            </div>
+                            
+                            <div class="form-group mb-3">
+                                <label class="form-label fw-bold text-secondary">Profile Picture</label>
+                                {% render_field customerForm.profile_pic class="form-control py-2 rounded-pill border-secondary" %}
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label class="form-label fw-bold text-secondary">Last Name</label>
+                                {% render_field userForm.last_name class="form-control py-2 rounded-pill border-secondary" placeholder="Last Name" %}
+                            </div>
+                            
+                            <div class="form-group mb-3">
+                                <label class="form-label fw-bold text-secondary">Password</label>
+                                {% render_field userForm.password class="form-control py-2 rounded-pill border-secondary" placeholder="Password" %}
+                                <small class="text-muted ms-3">Leave blank to keep current password</small>
+                            </div>
+                            
+                            <div class="form-group mb-3">
+                                <label class="form-label fw-bold text-secondary">Address</label>
+                                {% render_field customerForm.address class="form-control py-2 rounded-pill border-secondary" placeholder="Address" %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-center mt-4">
+                        <button type="submit" class="btn btn-primary text-white fw-bold rounded-pill py-3 px-5 shadow-sm">
+                            <i class="fa fa-check-circle me-2"></i> Update Customer
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}

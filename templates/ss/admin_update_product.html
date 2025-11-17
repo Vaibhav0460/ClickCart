@@ -1,0 +1,53 @@
+{% extends 'ss/admin_base.html' %}
+{% load widget_tweaks %}
+{% block content %}
+
+<div class="row justify-content-center">
+    <div class="col-lg-10 col-xl-8">
+        <div class="card border-0 shadow-sm rounded">
+            <div class="card-header bg-primary text-white py-3">
+                <h4 class="card-title mb-0 text-center fw-bold text-white">Update Product Details</h4>
+            </div>
+            <div class="card-body p-4 p-md-5">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label class="form-label fw-bold text-secondary">Product Name</label>
+                                {% render_field productForm.name class="form-control py-2 rounded-pill border-secondary" placeholder="Enter product name" %}
+                            </div>
+                            
+                            <div class="form-group mb-3">
+                                <label class="form-label fw-bold text-secondary">Price (₹)</label>
+                                {% render_field productForm.price class="form-control py-2 rounded-pill border-secondary" placeholder="Enter price" %}
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label class="form-label fw-bold text-secondary">Product Image</label>
+                                {% render_field productForm.product_image class="form-control py-2 rounded-pill border-secondary" %}
+                                <small class="text-muted ms-3">Leave blank to keep current image</small>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group h-100">
+                                <label class="form-label fw-bold text-secondary">Description</label>
+                                {% render_field productForm.description class="form-control border-secondary rounded" rows="8" placeholder="Enter product description..." style="border-radius: 15px !important;" %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-center mt-4">
+                        <button type="submit" class="btn btn-primary text-white fw-bold rounded-pill py-3 px-5 shadow-sm">
+                            <i class="fa fa-save me-2"></i> Update Product
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}
