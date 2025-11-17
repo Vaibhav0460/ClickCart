@@ -39,13 +39,13 @@
         {%endif%}
 
         <!-- Single Page Header start -->
-        <div class="container-fluid page-header py-5">
+        {% comment %} <div class="container-fluid page-header py-5">
             <h1 class="text-center text-white display-6">Contact</h1>
             <ol class="breadcrumb justify-content-center mb-0">
                 <li class="breadcrumb-item"><a href="#">Home</a></li>
                 <li class="breadcrumb-item active text-white">About Us</li>
             </ol>
-        </div>
+        </div> {% endcomment %}
         <!-- Single Page Header End -->
 
 
@@ -54,27 +54,127 @@
         flex-direction: column;
         align-items: center;
         vertical-align: middle;"> {% endcomment %}
-        <div>
-            <section id="about" class="container py-5"> <div class="row g-4 align-items-center"> <div class="col-lg-6"> 
-                {% comment %} <h2 class="text-primary display-6">About Us</h2>  {% endcomment %}
-                <h4 class="text-secondary">Welcome to <strong>ClickCart</strong></h4> <p> Welcome to <strong>ClickCart</strong>, your one-stop destination for fresh and organic groceries delivered right to your doorstep. </p> 
-                <p> At ClickCart, we believe that healthy living begins with healthy eating. That’s why we carefully source <strong>100% organic fruits, vegetables, and essentials</strong> from trusted farmers and suppliers. Our goal is to provide you with the finest quality produce at fair prices, while making your shopping experience simple, safe, and convenient. </p> 
-                <h5 class="mt-4">Why Choose Us?</h5>
-                <ul>
-                    <li><strong>Fresh &amp; Organic</strong> – Only the best, naturally grown produce.</li>
-                    <li><strong>Affordable Prices</strong> – Premium quality without the premium cost.</li>
-                    <li><strong>Easy Shopping</strong> – Browse, add to cart, and order in just a few clicks.</li>
-                    <li><strong>Reliable Delivery</strong> – Timely and hassle-free doorstep service.</li>
-                </ul>
-
-                <p class="mt-3">
-                    We are more than just an online store – we are a community committed to promoting healthier lifestyles and sustainable choices. With <strong>free shipping, secure payments, and 24/7 support</strong>, we ensure that every customer enjoys peace of mind while shopping with us.
-                </p>
-
-                <p><em>Join us in our journey towards a healthier tomorrow – one organic bite at a time!</em></p>
-</div> 
-<div class="col-lg-6"> <img class="img-fluid" src="../../static/img/about.jpg" alt=""> </div> </div> </section>
-</div>
+        <div class="container-fluid py-5">
+            <div class="container py-5">
+                <div class="row g-5 align-items-center">
+                    <div class="col-lg-6">
+                        <div class="h-100">
+                            <img src="{% static 'img/best-product-1.jpg' %}" class="img-fluid rounded w-100 shadow-sm" style="object-fit: cover; height: 500px;" alt="About ClickCart">
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <h4 class="text-secondary">Welcome to ClickCart</h4>
+                        <h1 class="display-5 text-primary mb-4">Fresh, Organic, & Trusted.</h1>
+                        <p class="mb-4">At ClickCart, we believe that healthy living begins with healthy eating. Founded on the principle that everyone deserves access to fresh, chemical-free produce, we bridge the gap between local organic farmers and your dining table.</p>
+                        <p class="mb-4">We are more than just an online store – we are a community committed to promoting healthier lifestyles and sustainable choices. From farm to fork, we ensure transparency, quality, and care in every package we deliver.</p>
+                        
+                        <div class="row g-4 mb-4">
+                            <div class="col-sm-6">
+                                <div class="d-flex align-items-center border-start border-5 border-primary px-3">
+                                    <h1 class="flex-shrink-0 display-5 text-primary mb-0" data-toggle="counter-up">10</h1>
+                                    <div class="ps-4">
+                                        <p class="mb-0">Years of</p>
+                                        <h6 class="text-uppercase mb-0">Experience</h6>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="d-flex align-items-center border-start border-5 border-secondary px-3">
+                                    <h1 class="flex-shrink-0 display-5 text-primary mb-0" data-toggle="counter-up">5k+</h1>
+                                    <div class="ps-4">
+                                        <p class="mb-0">Happy</p>
+                                        <h6 class="text-uppercase mb-0">Customers</h6>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <a href="/" class="btn btn-primary rounded-pill py-3 px-5">Shop Now</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="container-fluid bg-light py-5">
+            <div class="container py-5">
+                <div class="text-center mx-auto mb-5" style="max-width: 700px;">
+                    <h4 class="text-primary">Our Philosophy</h4>
+                    <h1 class="display-4">Grown by Nature, Delivered by Us</h1>
+                </div>
+                <div class="row g-4">
+                    <div class="col-lg-4 col-md-6">
+                        <div class="service-item bg-white rounded shadow-sm p-4 h-100">
+                            <div class="d-flex align-items-center justify-content-center bg-primary rounded-circle mb-4" style="width: 60px; height: 60px;">
+                                <i class="fas fa-seedling text-white fa-2x"></i>
+                            </div>
+                            <h4 class="mb-3">100% Organic</h4>
+                            <p class="mb-0">We partner strictly with certified organic farms to ensure that every fruit and vegetable is free from harmful pesticides and synthetic fertilizers.</p>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-6">
+                        <div class="service-item bg-white rounded shadow-sm p-4 h-100">
+                            <div class="d-flex align-items-center justify-content-center bg-secondary rounded-circle mb-4" style="width: 60px; height: 60px;">
+                                <i class="fas fa-hand-holding-heart text-white fa-2x"></i>
+                            </div>
+                            <h4 class="mb-3">Fair Trade</h4>
+                            <p class="mb-0">We believe in fair compensation. By cutting out unnecessary middlemen, we ensure our farmers get better rates while you get affordable prices.</p>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-6">
+                        <div class="service-item bg-white rounded shadow-sm p-4 h-100">
+                            <div class="d-flex align-items-center justify-content-center bg-primary rounded-circle mb-4" style="width: 60px; height: 60px;">
+                                <i class="fas fa-truck text-white fa-2x"></i>
+                            </div>
+                            <h4 class="mb-3">Sustainable Delivery</h4>
+                            <p class="mb-0">Our logistics are optimized to reduce carbon footprints. We use eco-friendly packaging to ensure we care for the planet as much as we care for you.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="container-fluid py-5">
+            <div class="container py-5">
+                <div class="row g-5">
+                    <div class="col-lg-6 order-2 order-lg-1">
+                        <h4 class="text-secondary">Why Choose ClickCart?</h4>
+                        <h1 class="display-5 mb-4">We deliver more than just groceries</h1>
+                        <p class="mb-4">In a world of mass-produced food, we stand for quality. Here is why thousands of families trust us for their daily nutrition:</p>
+                        <div class="row g-4">
+                            <div class="col-12">
+                                <div class="d-flex align-items-start">
+                                    <i class="fas fa-check-circle text-primary fa-2x me-3"></i>
+                                    <div>
+                                        <h5>Freshness Guaranteed</h5>
+                                        <p class="mb-0">If it's not fresh, we replace it. No questions asked.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="d-flex align-items-start">
+                                    <i class="fas fa-check-circle text-primary fa-2x me-3"></i>
+                                    <div>
+                                        <h5>Contactless Delivery</h5>
+                                        <p class="mb-0">Safety first. Our delivery partners follow strict hygiene protocols.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="d-flex align-items-start">
+                                    <i class="fas fa-check-circle text-primary fa-2x me-3"></i>
+                                    <div>
+                                        <h5>Secure Payments</h5>
+                                        <p class="mb-0">Multiple payment options with industry-standard encryption.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 order-1 order-lg-2">
+                         <div class="position-relative overflow-hidden rounded h-100">
+                            <img src="{% static 'img/banner-fruits.jpg' %}" class="img-fluid w-100 h-100 rounded" style="object-fit: cover;" alt="">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
         {% comment %} </div> {% endcomment %}
 
 
