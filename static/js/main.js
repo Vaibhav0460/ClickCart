@@ -297,16 +297,16 @@
                     '<td><div class="input-group quantity mt-4" style="width: 100px;">' +
                     '<div class="input-group-btn">' +
                     '<span class="btn btn-sm btn-minus rounded-circle bg-light border">' +
-                    '<a href="/cart-remove/' + product.id + '/" class="cart-remove-btn" data-product-id="' + product.id + '"><i class="fa fa-minus"></i></a>' +
+                    '<a href="/cart-remove/' + product.id + '" class="cart-remove-btn" data-product-id="' + product.id + '"><i class="fa fa-minus"></i></a>' +
                     '</span></div>' +
                     '<input type="text" class="form-control form-control-sm text-center border-0 cart-quantity" value="' + product.quantity + '" readonly>' +
                     '<div class="input-group-btn">' +
                     '<span class="btn btn-sm btn-plus rounded-circle bg-light border">' +
-                    '<a href="/cart-add/' + product.id + '/" class="cart-add-btn" data-product-id="' + product.id + '"><i class="fa fa-plus"></i></a>' +
+                    '<a href="/cart-add/' + product.id + '" class="cart-add-btn" data-product-id="' + product.id + '"><i class="fa fa-plus"></i></a>' +
                     '</span></div></div></td>' +
                     '<td><p class="mb-0 mt-4 cart-item-total">₹ ' + product.total + '</p></td>' +
                     '<td><span class="btn btn-md rounded-circle bg-light border mt-4">' +
-                    '<a href="/cart-delete/' + product.id + '/" class="cart-delete-btn" data-product-id="' + product.id + '"><i class="fa fa-times text-danger"></i></a>' +
+                    '<a href="/cart-delete/' + product.id + '" class="cart-delete-btn" data-product-id="' + product.id + '"><i class="fa fa-times text-danger"></i></a>' +
                     '</span></td></tr>';
             }
             tbody.html(html);
